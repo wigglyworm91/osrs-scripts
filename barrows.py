@@ -13,6 +13,7 @@ comp_criteria = {
         '3full': ('three full sets', lambda items: sum(all(items[i:i+4]) for i in range(0, len(items), 4)) >= 3),
         '4full': ('four full sets', lambda items: sum(all(items[i:i+4]) for i in range(0, len(items), 4)) >= 4),
         '5full': ('five full sets', lambda items: sum(all(items[i:i+4]) for i in range(0, len(items), 4)) >= 5),
+        'anyof6': ('any of six specific pieces', lambda items: any(items[:6])),
 }
 
 # completion criteria that can become impossible at some point
@@ -25,13 +26,14 @@ comp_criteria.update(failable_criteria)
 # these will be set later
 DESCRIPTION = ''
 is_complete = lambda: True
+CHANCE = 1/1
 
 def simulate(cutoff=float('inf')):
     items = [False] * 4 * 6
     num  = 0
     while not is_complete(items) and num <= cutoff:
         num += 1
-        if random.random() < 1/14.57:
+        if random.random() < CHANCE:
             items[random.randint(0, len(items)-1)] = True
     return num
 
@@ -43,7 +45,7 @@ def simulate2(chests):
     num  = 0
     while num < chests:
         num += 1
-        if random.random() < 1/14.57:
+        if random.random() < CHANCE:
             items[random.randint(0, len(items)-1)] = True
     return is_complete(items)
 
@@ -54,9 +56,11 @@ if __name__ == '__main__':
     parser.add_argument('--threshold', type=int, default=400)
     parser.add_argument('--mode', choices=comp_criteria.keys(), default='all')
     parser.add_argument('--trials', type=int, default=10000)
+    parser.add_argument('--chance', type=eval, default=eval('1/14.57'))
     args = parser.parse_args()
 
     DESCRIPTION, is_complete = comp_criteria[args.mode]
+    CHANCE = args.chance
 
     # this simulation does not make any sense if the completion criterion can be failed
     if args.mode not in failable_criteria:
