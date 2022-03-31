@@ -3,6 +3,21 @@ import sys
 
 THRESHOLD = 1000
 
+sets = lambda items: (items[i:i+4] for i in range(0, len(items), 4))
+
+def onedub(items):
+    for s in sets(items):
+        if all(item >= 2 for item in s):
+            return True
+
+def onedubnoother(items):
+    if not onedub(items): return False
+    num_sets = 0
+    for s in sets(items):
+        if all(s):
+            num_sets += 1
+    return num_sets == 1
+
 comp_criteria = {
         'fullset': ('one full set', lambda items: any(all(items[i:i+4]) for i in range(0, len(items), 4)) ),
         'all': ('all pieces', lambda items: all(items) ),
@@ -14,11 +29,13 @@ comp_criteria = {
         '4full': ('four full sets', lambda items: sum(all(items[i:i+4]) for i in range(0, len(items), 4)) >= 4),
         '5full': ('five full sets', lambda items: sum(all(items[i:i+4]) for i in range(0, len(items), 4)) >= 5),
         'anyof6': ('any of six specific pieces', lambda items: any(items[:6])),
+        'onedub': ('one double set', lambda items: any(all(item >= 2 for item in items[i:i+4]) for i in range(0, len(items), 4)) ),
 }
 
 # completion criteria that can become impossible at some point
 failable_criteria = {
         '3/4': ('exactly three out of four on all sets', lambda items: all((sum(items[i:i+4]) == 3) for i in range(0, len(items), 4))),
+        'onedubnoother': ('one double set and no other sets', onedubnoother),
 }
 
 comp_criteria.update(failable_criteria)
@@ -29,16 +46,16 @@ is_complete = lambda: True
 CHANCE = 1/1
 
 def simulate(cutoff=float('inf')):
-    items = [False] * 4 * 6
+    items = [0] * 4 * 6
     num  = 0
     while not is_complete(items) and num <= cutoff:
         num += 1
         if random.random() < CHANCE:
-            items[random.randint(0, len(items)-1)] = True
+            items[random.randint(0, len(items)-1)] += 1
     return num
 
 def simulate2(chests):
-    items = [False] * 4 * 6
+    items = [0] * 4 * 6
     #for i in range(0, 5*4, 4):
     #    items[i:i+3] = [True]*3
     #items[20] = items[21] = True
@@ -46,7 +63,7 @@ def simulate2(chests):
     while num < chests:
         num += 1
         if random.random() < CHANCE:
-            items[random.randint(0, len(items)-1)] = True
+            items[random.randint(0, len(items)-1)] += 1
     return is_complete(items)
 
 
