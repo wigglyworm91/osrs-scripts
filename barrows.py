@@ -19,22 +19,22 @@ def onedubnoother(items):
     return num_sets == 1
 
 comp_criteria = {
-        'fullset': ('one full set', lambda items: any(all(items[i:i+4]) for i in range(0, len(items), 4)) ),
         'all': ('all pieces', lambda items: all(items) ),
         'one': ('one specific piece', lambda items: items[0]),
         'two': ('two specific pieces', lambda items: all(items[0:2])),
         'three': ('three specific pieces', lambda items: all(items[0:3])),
-        '2full': ('two full sets', lambda items: sum(all(items[i:i+4]) for i in range(0, len(items), 4)) >= 2),
-        '3full': ('three full sets', lambda items: sum(all(items[i:i+4]) for i in range(0, len(items), 4)) >= 3),
-        '4full': ('four full sets', lambda items: sum(all(items[i:i+4]) for i in range(0, len(items), 4)) >= 4),
-        '5full': ('five full sets', lambda items: sum(all(items[i:i+4]) for i in range(0, len(items), 4)) >= 5),
+        'fullset': ('one full sets', lambda items: sum(all(s) for s in sets(items)) >= 1),
+        '2full': ('two full sets', lambda items: sum(all(s) for s in sets(items)) >= 2),
+        '3full': ('three full sets', lambda items: sum(all(s) for s in sets(items)) >= 3),
+        '4full': ('four full sets', lambda items: sum(all(s) for s in sets(items)) >= 4),
+        '5full': ('five full sets', lambda items: sum(all(s) for s in sets(items)) >= 5),
         'anyof6': ('any of six specific pieces', lambda items: any(items[:6])),
-        'onedub': ('one double set', lambda items: any(all(item >= 2 for item in items[i:i+4]) for i in range(0, len(items), 4)) ),
+        'onedub': ('one double set', onedub),
 }
 
 # completion criteria that can become impossible at some point
 failable_criteria = {
-        '3/4': ('exactly three out of four on all sets', lambda items: all((sum(items[i:i+4]) == 3) for i in range(0, len(items), 4))),
+        '3/4': ('exactly three out of four on all sets', lambda items: all((sum(s) == 3) for s in sets(items))),
         'onedubnoother': ('one double set and no other sets', onedubnoother),
 }
 
