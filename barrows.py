@@ -69,12 +69,15 @@ def simulate2(chests):
 
 if __name__ == '__main__':
     import argparse
+    from datetime import datetime
     parser = argparse.ArgumentParser()
     parser.add_argument('--threshold', type=int, default=400)
     parser.add_argument('--mode', choices=comp_criteria.keys(), default='all')
     parser.add_argument('--trials', type=int, default=10000)
     parser.add_argument('--chance', type=eval, default=eval('1/14.57'))
     args = parser.parse_args()
+
+    start_time = datetime.now()
 
     DESCRIPTION, is_complete = comp_criteria[args.mode]
     CHANCE = args.chance
@@ -101,3 +104,5 @@ if __name__ == '__main__':
         tot2 += result
 
     print(f'Of those who do {args.threshold} chests, {tot2 * 100.0 / N}% have {DESCRIPTION}')
+    end_time = datetime.now()
+    print(f'Script ran in {end_time - start_time}')
